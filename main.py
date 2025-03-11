@@ -1,13 +1,16 @@
+# main.py
 from fastapi import FastAPI
+from routers import backtest
 
 app = FastAPI()
 
+# backtest 라우터 등록
+app.include_router(backtest.router, prefix="/api")
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+def root():
+    return {"message": "FastAPI Backtest Service"}
 
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
