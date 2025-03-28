@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy FastAPI to EC2
 
 on:
   push:
@@ -13,20 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup SSH key
+      - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ec2-your-public-ip >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
+      - name: Deploy to EC2 and restart FastAPI
         run: |
-          ssh ubuntu@ec2-your-public-ip '
-            cd ~/fastapi-app/backtest_be_fast &&
-            git pull origin main &&
-            source ../venv/bin/activate &&
-            pip install -r requirements.txt &&
-            pkill -f "uvicorn" || true &&
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            cd ~/fastapi-app/backtest_be_fast
+            git pull origin main
+            source ../venv/bin/activate
+            pip install -r requirements.txt
+            pkill -f "uvicorn" || true
             nohup uvicorn main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
-          '
+          EOF
