@@ -1,0 +1,32 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ec2-your-public-ip >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh ubuntu@ec2-your-public-ip '
+            cd ~/fastapi-app/backtest_be_fast &&
+            git pull origin main &&
+            source ../venv/bin/activate &&
+            pip install -r requirements.txt &&
+            pkill -f "uvicorn" || true &&
+            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
+          '
