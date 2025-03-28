@@ -1,4 +1,4 @@
-name: Deploy FastAPI to EC2
+name: Deploy FastAPI to EC2 with Docker
 
 on:
   push:
@@ -13,21 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy to EC2 and restart FastAPI
+      - name: Copy source code to EC2
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            set -e
-            cd ~/fastapi-app/backtest_be_fast
-            git pull origin main
-            source ../venv/bin/activate
-            pip install -r requirements.txt
-            pkill -f "uvicorn" || true
-            nohup uvicorn main:app --host 0.0.0.0 --port 8000 > app.log 2>&1 &
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            # 경로 정리
+            rm -rf ~/fastapi-app
+            git clone https://github.com/capstone-backtest/backtest_be_fast.git ~/fastapi-app
+            cd ~/fastapi-app
+
+            # Docker 빌드 및 재시작
+            docker stop fastapi-container || true
+            docker rm fastapi-container || true
+            docker build -t fastapi-app .
+            docker run -d -p 8000:8000 --name fastapi-container fastapi-app
           EOF
