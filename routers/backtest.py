@@ -2,7 +2,6 @@
 from fastapi import APIRouter
 import backtrader as bt
 import yfinance as yf
-import pandas as pd
 
 # 전략 임포트
 from strategies.sma_strategy import SmaCross

@@ -1,7 +1,6 @@
 # strategies/lump_sum_strategy.py
 import backtrader as bt
 
-
 class LumpSumStrategy(bt.Strategy):
     """
     거치식 투자 전략:
