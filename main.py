@@ -9,7 +9,7 @@ app.include_router(backtest.router, prefix="/api")
 
 @app.get("/")
 def root():
-    return {"message": "FastAPI Backtest Service"}
+    return {"message": "V2"}
 
 if __name__ == "__main__":
     import uvicorn
