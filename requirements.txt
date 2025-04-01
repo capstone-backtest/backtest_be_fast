@@ -1,8 +1,6 @@
 fastapi
 uvicorn
-backtrader
+backtesting
 yfinance
 pandas
 numpy
-pandas-ta
-matplotlib
