@@ -10,7 +10,6 @@ import warnings
 
 app = FastAPI()
 
-
 # 백테스트 전략 (이동평균 교차 전략) 정의
 class SmaCross(Strategy):
     n1 = 10  # 단기 이동평균 기간
@@ -34,7 +33,6 @@ class BacktestRequest(BaseModel):
     end_date: str  # 예: "2021-01-01"
     cash: float = 10000
     commission: float = 0.002
-
 
 # 재귀적 직렬화 함수
 def recursive_serialize(obj):
@@ -68,7 +66,6 @@ def recursive_serialize(obj):
         return obj.isoformat()
     # 위에 해당하지 않는 경우, str()로 변환 (예: DatetimeEngine 등)
     return str(obj)
-
 
 # 백테스트 실행을 위한 비동기 엔드포인트
 @app.post("/backtest/")
@@ -114,7 +111,6 @@ async def run_backtest(req: BacktestRequest):
         # 오류 발생 시 에러 메시지와 함께 응답
         error_response = {"error": str(e), "type": type(e).__name__}
         raise HTTPException(status_code=500, detail=error_response)
-
 
 # 서버 실행을 위한 기본 루트 엔드포인트
 @app.get("/")
