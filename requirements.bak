@@ -1,0 +1,39 @@
+# FastAPI 관??
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.11.7
+pydantic-settings==2.1.0
+
+# 백테?�팅 ?�이브러�?
+# 개발 ?�경: -e ../
+# 배포 ?�경: ?�래 주석 ?�제?�여 ?�용
+# numpy>=1.17.0
+# pandas>=0.25.0
+# bokeh>=1.4.0
+
+# ?�이???�집
+yfinance==0.2.28
+requests==2.31.0
+
+# ?��?지 처리 �??�각??(Windows ?�환??개선)
+Pillow>=10.2.0
+matplotlib>=3.8.0
+bokeh>=3.0.0
+
+# 비동�?처리
+aiofiles==23.2.0
+
+# 로깅
+structlog==23.2.0
+
+# ?�경변??관�?
+python-dotenv==1.0.0
+
+# 개발 ?�구
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+isort==5.12.0
+
+# 보안
+python-multipart==0.0.6 

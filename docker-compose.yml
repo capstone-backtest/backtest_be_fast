@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  backtesting-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - SECRET_KEY=your-secret-key-change-in-production
+    volumes:
+      - ./data_cache:/app/api_server/data_cache
+      - ./logs:/app/api_server/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - backtesting-net
+
+  # 선택사항: Redis 캐시 (향후 확장용)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - backtesting-net
+    profiles:
+      - cache
+
+  # 선택사항: PostgreSQL 데이터베이스 (향후 확장용)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: backtesting
+      POSTGRES_USER: backtesting_user
+      POSTGRES_PASSWORD: backtesting_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - backtesting-net
+    profiles:
+      - database
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  backtesting-net:
+    driver: bridge 
